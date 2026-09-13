@@ -1,0 +1,272 @@
+{
+  "A": {
+    "backend": "DSHOW",
+    "req_res": "1280x720",
+    "raw": {
+      "opened": true,
+      "actual_width": 1280,
+      "actual_height": 720,
+      "driver_fps": 30.00003000003,
+      "successful_reads": 10,
+      "failed_reads": 0,
+      "measured_fps": 1.0,
+      "intervals": {
+        "avg": 1000.0,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1000.0
+      },
+      "read_durations": {
+        "avg": 1000.0,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1000.0
+      }
+    },
+    "async": {
+      "captured": 8,
+      "consumed": 8,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 0.9842519685025414,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 14.00000000126056,
+      "avg_perception_ms": 14.00000000126056
+    }
+  },
+  "B": {
+    "backend": "MSMF",
+    "req_res": "1280x720",
+    "raw": {
+      "opened": true,
+      "actual_width": 1280,
+      "actual_height": 720,
+      "driver_fps": 30.0,
+      "successful_reads": 0,
+      "failed_reads": 3184059,
+      "measured_fps": 0.0,
+      "intervals": {
+        "avg": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "read_durations": {
+        "avg": 0.0029537769243599614,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 16.00000000144064
+      }
+    },
+    "async": {
+      "captured": 0,
+      "consumed": 0,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 0.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 0.0,
+      "avg_perception_ms": 0.0
+    }
+  },
+  "C": {
+    "backend": "ANY",
+    "req_res": "1280x720",
+    "raw": {
+      "opened": true,
+      "actual_width": 1280,
+      "actual_height": 720,
+      "driver_fps": 30.0,
+      "successful_reads": 0,
+      "failed_reads": 3200602,
+      "measured_fps": 0.0,
+      "intervals": {
+        "avg": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "read_durations": {
+        "avg": 0.0029138268363261386,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 16.00000000144064
+      }
+    },
+    "async": {
+      "captured": 0,
+      "consumed": 0,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 0.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 0.0,
+      "avg_perception_ms": 0.0
+    }
+  },
+  "D": {
+    "backend": "DSHOW",
+    "req_res": "640x480",
+    "raw": {
+      "opened": true,
+      "actual_width": 640,
+      "actual_height": 480,
+      "driver_fps": 30.00003000003,
+      "successful_reads": 10,
+      "failed_reads": 0,
+      "measured_fps": 1.0,
+      "intervals": {
+        "avg": 1000.0,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1000.0
+      },
+      "read_durations": {
+        "avg": 1000.0,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1000.0
+      }
+    },
+    "async": {
+      "captured": 8,
+      "consumed": 8,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 1.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 5.999999999858119,
+      "avg_perception_ms": 5.999999999858119
+    }
+  },
+  "E": {
+    "backend": "MSMF",
+    "req_res": "640x480",
+    "raw": {
+      "opened": true,
+      "actual_width": 640,
+      "actual_height": 480,
+      "driver_fps": 30.0,
+      "successful_reads": 0,
+      "failed_reads": 3121659,
+      "measured_fps": 0.0,
+      "intervals": {
+        "avg": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "read_durations": {
+        "avg": 0.0030330026437867673,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 16.00000000144064
+      }
+    },
+    "async": {
+      "captured": 0,
+      "consumed": 0,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 0.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 0.0,
+      "avg_perception_ms": 0.0
+    }
+  },
+  "F": {
+    "backend": "ANY",
+    "req_res": "640x480",
+    "raw": {
+      "opened": true,
+      "actual_width": 640,
+      "actual_height": 480,
+      "driver_fps": 30.0,
+      "successful_reads": 0,
+      "failed_reads": 3143395,
+      "measured_fps": 0.0,
+      "intervals": {
+        "avg": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "read_durations": {
+        "avg": 0.0030218919353107573,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 16.00000000144064
+      }
+    },
+    "async": {
+      "captured": 0,
+      "consumed": 0,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 0.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 0.0,
+      "avg_perception_ms": 0.0
+    }
+  },
+  "G": {
+    "backend": "DSHOW",
+    "req_res": "960x540",
+    "raw": {
+      "opened": true,
+      "actual_width": 960,
+      "actual_height": 540,
+      "driver_fps": 30.00003000003,
+      "successful_reads": 10,
+      "failed_reads": 0,
+      "measured_fps": 0.9982253771074066,
+      "intervals": {
+        "avg": 1001.7777777777358,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1015.9999999996217
+      },
+      "read_durations": {
+        "avg": 1001.5999999999622,
+        "median": 1000.0,
+        "min": 1000.0,
+        "max": 1015.9999999996217
+      }
+    },
+    "async": {
+      "captured": 8,
+      "consumed": 8,
+      "dropped": 0,
+      "drop_ratio": 0.0,
+      "app_fps": 1.0,
+      "avg_frame_age_ms": 0.0,
+      "avg_cap2proc_ms": 15.99999999962165,
+      "avg_perception_ms": 15.99999999962165
+    }
+  },
+  "H": {
+    "backend": "NATIVE_DEFAULT",
+    "req_res": "DEFAULT",
+    "raw": {
+      "opened": true,
+      "actual_width": 640,
+      "actual_height": 480,
+      "driver_fps": 30.0,
+      "successful_reads": 0,
+      "failed_reads": 2291672,
+      "measured_fps": 0.0,
+      "intervals": {
+        "avg": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "read_durations": {
+        "avg": 0.003982245277686187,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 16.00000000144064
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+# Magic Mirror source package
