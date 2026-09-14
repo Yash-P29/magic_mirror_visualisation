@@ -66,6 +66,12 @@ def run_raw_diagnostic(
     act_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     act_fps = cap.get(cv2.CAP_PROP_FPS)
 
+    try:
+        fourcc_val = int(cap.get(cv2.CAP_PROP_FOURCC))
+        fourcc_str = "".join([chr((fourcc_val >> (8 * i)) & 0xFF) for i in range(4)]) if fourcc_val > 0 else "N/A"
+    except Exception:
+        fourcc_str = "N/A"
+
     # Warmup 5 frames
     for _ in range(5):
         cap.read()
@@ -74,6 +80,7 @@ def run_raw_diagnostic(
     read_durations: List[float] = []
     successes = 0
     failures = 0
+    consecutive_failures = 0
 
     t_start = time.monotonic()
     while time.monotonic() - t_start < duration:
@@ -85,8 +92,14 @@ def run_raw_diagnostic(
         if ret and frame is not None and frame.size > 0:
             successes += 1
             timestamps.append(t1)
+            consecutive_failures = 0
         else:
             failures += 1
+            consecutive_failures += 1
+            time.sleep(0.01)  # prevent busy spin on dead backends
+            if consecutive_failures > 50:
+                print(f"    [Diagnostic] Backend {backend_flag} hit 50 consecutive read failures; terminating test early.")
+                break
 
     cap.release()
 
@@ -103,8 +116,10 @@ def run_raw_diagnostic(
         "actual_width": act_w,
         "actual_height": act_h,
         "driver_fps": act_fps,
+        "fourcc": fourcc_str,
         "successful_reads": successes,
         "failed_reads": failures,
+        "consecutive_failures_exceeded": consecutive_failures > 50,
         "measured_fps": measured_fps,
         "intervals": {
             "avg": statistics.mean(intervals) if intervals else 0.0,
@@ -137,6 +152,7 @@ def run_default_native_diagnostic(duration: float = 10.0) -> Dict[str, Any]:
     read_durations: List[float] = []
     successes = 0
     failures = 0
+    consecutive_failures = 0
 
     t_start = time.monotonic()
     while time.monotonic() - t_start < duration:
@@ -148,8 +164,13 @@ def run_default_native_diagnostic(duration: float = 10.0) -> Dict[str, Any]:
         if ret and frame is not None and frame.size > 0:
             successes += 1
             timestamps.append(t1)
+            consecutive_failures = 0
         else:
             failures += 1
+            consecutive_failures += 1
+            time.sleep(0.01)
+            if consecutive_failures > 50:
+                break
 
     cap.release()
 
@@ -195,10 +216,6 @@ def run_async_diagnostic(
     except Exception as e:
         return {"opened": False, "error": str(e)}
 
-    cam._cap.set(cv2.CAP_PROP_FRAME_WIDTH, req_w)
-    cam._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, req_h)
-    cam._cap.set(cv2.CAP_PROP_FPS, 30.0)
-
     reader = AsyncCameraReader(cam)
     reader.start()
 
@@ -233,6 +250,7 @@ def run_async_diagnostic(
             capture_timestamp=frame.capture_timestamp,
             process_start=p_start,
             process_end=p_end,
+            capture_read_ms=reader.last_read_duration_ms,
         )
 
     if pipeline:
@@ -245,7 +263,9 @@ def run_async_diagnostic(
         "consumed": reader.consumed_frames,
         "dropped": reader.dropped_frames,
         "drop_ratio": reader.drop_ratio,
+        "capture_fps": reader.capture_fps,
         "app_fps": fps_counter.fps,
+        "invariant_valid": reader.invariant_valid,
         "avg_frame_age_ms": s.avg_frame_age_ms,
         "avg_cap2proc_ms": s.avg_capture_to_processing_ms,
         "avg_perception_ms": s.avg_perception_ms,

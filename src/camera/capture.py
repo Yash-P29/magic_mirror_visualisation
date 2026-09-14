@@ -30,6 +30,8 @@ from typing import Optional
 import cv2
 import numpy as np
 
+from src.monitoring.metrics import FPSCounter
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -112,6 +114,9 @@ class Camera:
         self.actual_width: int = 0
         self.actual_height: int = 0
         self.actual_fps: float = 0.0
+        self.actual_backend: int = backend
+        self.actual_fourcc: str = "N/A"
+        self.actual_buffersize: Optional[int] = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -154,6 +159,23 @@ class Camera:
         self.actual_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.actual_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.actual_fps = cap.get(cv2.CAP_PROP_FPS)
+        self.actual_backend = self._backend
+
+        try:
+            fourcc_val = int(cap.get(cv2.CAP_PROP_FOURCC))
+            if fourcc_val > 0:
+                chars = [chr((fourcc_val >> (8 * i)) & 0xFF) for i in range(4)]
+                self.actual_fourcc = "".join(chars)
+            else:
+                self.actual_fourcc = "N/A"
+        except Exception:
+            self.actual_fourcc = "N/A"
+
+        try:
+            buf_val = int(cap.get(cv2.CAP_PROP_BUFFERSIZE))
+            self.actual_buffersize = buf_val if buf_val >= 0 else None
+        except Exception:
+            self.actual_buffersize = None
 
         self._cap = cap
         self._frame_id = 0
@@ -175,10 +197,13 @@ class Camera:
             )
 
         logger.info(
-            "Camera opened: %dx%d @ %.1f FPS (reported by driver).",
+            "Camera opened: %dx%d @ %.1f FPS (backend=%d, FOURCC=%s, buffer_size=%s).",
             self.actual_width,
             self.actual_height,
             self.actual_fps,
+            self.actual_backend,
+            self.actual_fourcc,
+            str(self.actual_buffersize),
         )
 
     def read(self) -> Optional[CapturedFrame]:
@@ -240,7 +265,8 @@ class Camera:
             f"Camera(device={self._device_index}, "
             f"status={status}, "
             f"resolution={self.actual_width}x{self.actual_height}, "
-            f"fps={self.actual_fps:.1f})"
+            f"fps={self.actual_fps:.1f}, "
+            f"fourcc={self.actual_fourcc})"
         )
 
 
@@ -260,6 +286,7 @@ class AsyncCameraReader:
         - captured_frames: total frames captured by camera thread
         - consumed_frames: total frames retrieved by processing thread
         - dropped_frames: total frames replaced/overwritten before retrieval
+        - capture_fps: rolling FPS of the hardware capture loop
     """
 
     def __init__(self, camera: Camera) -> None:
@@ -274,11 +301,12 @@ class AsyncCameraReader:
         self._latest_frame: Optional[CapturedFrame] = None
         self._has_new_frame: bool = False
 
-        # Counters
+        # Counters & Telemetry
         self._captured_frames: int = 0
         self._consumed_frames: int = 0
         self._dropped_frames: int = 0
         self._last_read_duration_ms: float = 0.0
+        self._capture_fps_counter = FPSCounter(window_seconds=2.0)
 
     @property
     def camera(self) -> Camera:
@@ -300,11 +328,28 @@ class AsyncCameraReader:
             return self._dropped_frames
 
     @property
+    def currently_buffered(self) -> int:
+        with self._lock:
+            return 1 if self._has_new_frame else 0
+
+    @property
+    def invariant_valid(self) -> bool:
+        with self._lock:
+            return self._captured_frames == (
+                self._consumed_frames + self._dropped_frames + (1 if self._has_new_frame else 0)
+            )
+
+    @property
     def drop_ratio(self) -> float:
         with self._lock:
             if self._captured_frames == 0:
                 return 0.0
             return self._dropped_frames / self._captured_frames
+
+    @property
+    def capture_fps(self) -> float:
+        with self._lock:
+            return self._capture_fps_counter.fps
 
     @property
     def last_read_duration_ms(self) -> float:
@@ -351,6 +396,8 @@ class AsyncCameraReader:
 
                 if frame is not None:
                     self._captured_frames += 1
+                    self._capture_fps_counter.tick(frame.capture_timestamp)
+
                     if self._has_new_frame:
                         self._dropped_frames += 1
 
@@ -380,7 +427,7 @@ class AsyncCameraReader:
             return frame
 
     def stop(self) -> None:
-        """Stop the background capture thread and release camera resources."""
+        """Stop the background capture thread and release camera resources cleanly."""
         with self._lock:
             if not self._running:
                 return

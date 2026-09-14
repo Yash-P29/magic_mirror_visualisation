@@ -7,31 +7,35 @@
       "actual_width": 1280,
       "actual_height": 720,
       "driver_fps": 30.00003000003,
-      "successful_reads": 10,
+      "fourcc": "YUY2",
+      "successful_reads": 101,
       "failed_reads": 0,
-      "measured_fps": 1.0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 10.047221943124027,
       "intervals": {
-        "avg": 1000.0,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1000.0
+        "avg": 99.53000000008615,
+        "median": 93.99999999732245,
+        "min": 62.000000005355105,
+        "max": 125.0
       },
       "read_durations": {
-        "avg": 1000.0,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1000.0
+        "avg": 99.00990099009901,
+        "median": 93.99999999732245,
+        "min": 46.999999991385266,
+        "max": 125.0
       }
     },
     "async": {
-      "captured": 8,
-      "consumed": 8,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 0.9842519685025414,
+      "captured": 86,
+      "consumed": 82,
+      "dropped": 3,
+      "drop_ratio": 0.03488372093023256,
+      "capture_fps": 10.0,
+      "app_fps": 10.0,
+      "invariant_valid": true,
       "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 14.00000000126056,
-      "avg_perception_ms": 14.00000000126056
+      "avg_cap2proc_ms": 22.63333333345751,
+      "avg_perception_ms": 22.366666666736517
     }
   },
   "B": {
@@ -42,31 +46,35 @@
       "actual_width": 1280,
       "actual_height": 720,
       "driver_fps": 30.0,
-      "successful_reads": 0,
-      "failed_reads": 3184059,
-      "measured_fps": 0.0,
+      "fourcc": "\u0016\u0000\u0000\u0000",
+      "successful_reads": 297,
+      "failed_reads": 0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 29.647435897445575,
       "intervals": {
-        "avg": 0.0,
+        "avg": 33.72972972971872,
         "median": 0.0,
         "min": 0.0,
-        "max": 0.0
+        "max": 218.99999999732245
       },
       "read_durations": {
-        "avg": 0.0029537769243599614,
+        "avg": 33.67003367003367,
         "median": 0.0,
         "min": 0.0,
-        "max": 16.00000000144064
+        "max": 218.99999999732245
       }
     },
     "async": {
-      "captured": 0,
-      "consumed": 0,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 0.0,
-      "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 0.0,
-      "avg_perception_ms": 0.0
+      "captured": 244,
+      "consumed": 157,
+      "dropped": 86,
+      "drop_ratio": 0.3524590163934426,
+      "capture_fps": 31.0,
+      "app_fps": 20.0,
+      "invariant_valid": true,
+      "avg_frame_age_ms": 8.066666667339936,
+      "avg_cap2proc_ms": 24.50000000098953,
+      "avg_perception_ms": 16.433333333649596
     }
   },
   "C": {
@@ -77,31 +85,35 @@
       "actual_width": 1280,
       "actual_height": 720,
       "driver_fps": 30.0,
-      "successful_reads": 0,
-      "failed_reads": 3200602,
-      "measured_fps": 0.0,
+      "fourcc": "\u0016\u0000\u0000\u0000",
+      "successful_reads": 300,
+      "failed_reads": 0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 29.9,
       "intervals": {
-        "avg": 0.0,
+        "avg": 33.44481605351171,
         "median": 0.0,
         "min": 0.0,
-        "max": 0.0
+        "max": 110.00000000058208
       },
       "read_durations": {
-        "avg": 0.0029138268363261386,
+        "avg": 33.386666666629026,
         "median": 0.0,
         "min": 0.0,
-        "max": 16.00000000144064
+        "max": 110.00000000058208
       }
     },
     "async": {
-      "captured": 0,
-      "consumed": 0,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 0.0,
-      "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 0.0,
-      "avg_perception_ms": 0.0
+      "captured": 244,
+      "consumed": 156,
+      "dropped": 87,
+      "drop_ratio": 0.35655737704918034,
+      "capture_fps": 29.5,
+      "app_fps": 19.0,
+      "invariant_valid": true,
+      "avg_frame_age_ms": 9.116666666280556,
+      "avg_cap2proc_ms": 22.883333332720213,
+      "avg_perception_ms": 13.766666666439656
     }
   },
   "D": {
@@ -112,31 +124,35 @@
       "actual_width": 640,
       "actual_height": 480,
       "driver_fps": 30.00003000003,
-      "successful_reads": 10,
+      "fourcc": "YUY2",
+      "successful_reads": 100,
       "failed_reads": 0,
-      "measured_fps": 1.0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 9.993943064821186,
       "intervals": {
-        "avg": 1000.0,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1000.0
+        "avg": 100.06060606048612,
+        "median": 93.99999999732245,
+        "min": 92.99999999348074,
+        "max": 125.0
       },
       "read_durations": {
-        "avg": 1000.0,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1000.0
+        "avg": 100.0,
+        "median": 93.99999999732245,
+        "min": 92.99999999348074,
+        "max": 125.0
       }
     },
     "async": {
-      "captured": 8,
-      "consumed": 8,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 1.0,
-      "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 5.999999999858119,
-      "avg_perception_ms": 5.999999999858119
+      "captured": 83,
+      "consumed": 80,
+      "dropped": 2,
+      "drop_ratio": 0.024096385542168676,
+      "capture_fps": 10.080645161232948,
+      "app_fps": 10.0,
+      "invariant_valid": true,
+      "avg_frame_age_ms": 0.2666666667209938,
+      "avg_cap2proc_ms": 22.416666666928602,
+      "avg_perception_ms": 21.900000000217307
     }
   },
   "E": {
@@ -147,31 +163,35 @@
       "actual_width": 640,
       "actual_height": 480,
       "driver_fps": 30.0,
-      "successful_reads": 0,
-      "failed_reads": 3121659,
-      "measured_fps": 0.0,
+      "fourcc": "\u0016\u0000\u0000\u0000",
+      "successful_reads": 300,
+      "failed_reads": 0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 29.9,
       "intervals": {
-        "avg": 0.0,
+        "avg": 33.44481605351171,
         "median": 0.0,
         "min": 0.0,
-        "max": 0.0
+        "max": 141.00000000325963
       },
       "read_durations": {
-        "avg": 0.0030330026437867673,
+        "avg": 33.333333333333336,
         "median": 0.0,
         "min": 0.0,
-        "max": 16.00000000144064
+        "max": 141.00000000325963
       }
     },
     "async": {
-      "captured": 0,
-      "consumed": 0,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 0.0,
-      "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 0.0,
-      "avg_perception_ms": 0.0
+      "captured": 247,
+      "consumed": 158,
+      "dropped": 88,
+      "drop_ratio": 0.3562753036437247,
+      "capture_fps": 31.0,
+      "app_fps": 20.0,
+      "invariant_valid": true,
+      "avg_frame_age_ms": 8.883333333748547,
+      "avg_cap2proc_ms": 23.266666666556073,
+      "avg_perception_ms": 14.383333332807524
     }
   },
   "F": {
@@ -182,31 +202,35 @@
       "actual_width": 640,
       "actual_height": 480,
       "driver_fps": 30.0,
-      "successful_reads": 0,
-      "failed_reads": 3143395,
-      "measured_fps": 0.0,
+      "fourcc": "\u0016\u0000\u0000\u0000",
+      "successful_reads": 297,
+      "failed_reads": 0,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 29.6,
       "intervals": {
-        "avg": 0.0,
+        "avg": 33.78378378378378,
         "median": 0.0,
         "min": 0.0,
-        "max": 0.0
+        "max": 187.0000000053551
       },
       "read_durations": {
-        "avg": 0.0030218919353107573,
+        "avg": 33.67003367003367,
         "median": 0.0,
         "min": 0.0,
-        "max": 16.00000000144064
+        "max": 187.0000000053551
       }
     },
     "async": {
-      "captured": 0,
-      "consumed": 0,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 0.0,
-      "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 0.0,
-      "avg_perception_ms": 0.0
+      "captured": 250,
+      "consumed": 158,
+      "dropped": 91,
+      "drop_ratio": 0.364,
+      "capture_fps": 31.0,
+      "app_fps": 20.0,
+      "invariant_valid": true,
+      "avg_frame_age_ms": 9.466666667140089,
+      "avg_cap2proc_ms": 24.91666666683159,
+      "avg_perception_ms": 15.4499999996915
     }
   },
   "G": {
@@ -217,31 +241,35 @@
       "actual_width": 960,
       "actual_height": 540,
       "driver_fps": 30.00003000003,
-      "successful_reads": 10,
+      "fourcc": "YUY2",
+      "successful_reads": 101,
       "failed_reads": 0,
-      "measured_fps": 0.9982253771074066,
+      "consecutive_failures_exceeded": false,
+      "measured_fps": 10.0,
       "intervals": {
-        "avg": 1001.7777777777358,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1015.9999999996217
+        "avg": 100.0,
+        "median": 93.99999999732245,
+        "min": 92.99999999348074,
+        "max": 125.0
       },
       "read_durations": {
-        "avg": 1001.5999999999622,
-        "median": 1000.0,
-        "min": 1000.0,
-        "max": 1015.9999999996217
+        "avg": 99.94059405937944,
+        "median": 93.99999999732245,
+        "min": 92.99999999348074,
+        "max": 125.0
       }
     },
     "async": {
-      "captured": 8,
-      "consumed": 8,
-      "dropped": 0,
-      "drop_ratio": 0.0,
-      "app_fps": 1.0,
+      "captured": 83,
+      "consumed": 80,
+      "dropped": 2,
+      "drop_ratio": 0.024096385542168676,
+      "capture_fps": 10.0,
+      "app_fps": 10.0,
+      "invariant_valid": true,
       "avg_frame_age_ms": 0.0,
-      "avg_cap2proc_ms": 15.99999999962165,
-      "avg_perception_ms": 15.99999999962165
+      "avg_cap2proc_ms": 21.033333333859144,
+      "avg_perception_ms": 21.033333333859144
     }
   },
   "H": {
@@ -252,20 +280,20 @@
       "actual_width": 640,
       "actual_height": 480,
       "driver_fps": 30.0,
-      "successful_reads": 0,
-      "failed_reads": 2291672,
-      "measured_fps": 0.0,
+      "successful_reads": 300,
+      "failed_reads": 0,
+      "measured_fps": 29.9,
       "intervals": {
-        "avg": 0.0,
+        "avg": 33.44481605351171,
         "median": 0.0,
         "min": 0.0,
-        "max": 0.0
+        "max": 171.99999999138527
       },
       "read_durations": {
-        "avg": 0.003982245277686187,
+        "avg": 33.333333333333336,
         "median": 0.0,
         "min": 0.0,
-        "max": 16.00000000144064
+        "max": 171.99999999138527
       }
     }
   }

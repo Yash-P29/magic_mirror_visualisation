@@ -15,7 +15,8 @@ Design goals:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from enum import Enum
+from typing import List, Optional, Sequence, Tuple
 
 
 # ---------------------------------------------------------------------------
@@ -133,8 +134,12 @@ class PoseData:
                          (meters, origin at hip midpoint).  May be empty if
                          the backend did not provide world landmarks.
     """
-    landmarks: List[Landmark]        # len == 33, normalized image coords
-    world_landmarks: List[Landmark]  # len == 33, metric coords; may be []
+    landmarks: Tuple[Landmark, ...]        # len == 33, normalized image coords
+    world_landmarks: Tuple[Landmark, ...] = ()  # len == 33, metric coords; may be ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "landmarks", tuple(self.landmarks))
+        object.__setattr__(self, "world_landmarks", tuple(self.world_landmarks))
 
     def get(self, index: int) -> Optional[Landmark]:
         """Return the landmark at *index*, or None if out of range."""
@@ -206,11 +211,23 @@ class HandData:
                     (mirrored relative to the camera image by default).
         landmarks:  21 hand landmarks in normalized image coordinates.
                     Index mapping follows HandLandmarkIndex constants.
-        score:      Handedness classification confidence [0, 1].
+        score:      Handedness classification confidence [0, 1] if available,
+                    or None if the backend model does not expose confidence.
     """
     handedness: str       # "Left" or "Right"
-    landmarks: List[Landmark]   # len == 21
-    score: float = 1.0    # handedness confidence
+    landmarks: Tuple[Landmark, ...]   # len == 21
+    score: Optional[float] = None    # handedness confidence (None if unavailable)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "landmarks", tuple(self.landmarks))
+
+    @property
+    def is_left(self) -> bool:
+        return self.handedness == "Left"
+
+    @property
+    def is_right(self) -> bool:
+        return self.handedness == "Right"
 
     def get(self, index: int) -> Optional[Landmark]:
         """Return the landmark at *index*, or None if out of range."""
@@ -221,6 +238,10 @@ class HandData:
     @property
     def wrist(self) -> Optional[Landmark]:
         return self.get(HandLandmarkIndex.WRIST)
+    
+    @property
+    def index_mcp(self) -> Optional[Landmark]:
+        return self.get(HandLandmarkIndex.INDEX_FINGER_MCP)
 
     @property
     def index_tip(self) -> Optional[Landmark]:
@@ -229,6 +250,18 @@ class HandData:
     @property
     def thumb_tip(self) -> Optional[Landmark]:
         return self.get(HandLandmarkIndex.THUMB_TIP)
+        
+    @property
+    def middle_tip(self) -> Optional[Landmark]:
+        return self.get(HandLandmarkIndex.MIDDLE_FINGER_TIP)
+        
+    @property
+    def ring_tip(self) -> Optional[Landmark]:
+        return self.get(HandLandmarkIndex.RING_FINGER_TIP)
+        
+    @property
+    def pinky_tip(self) -> Optional[Landmark]:
+        return self.get(HandLandmarkIndex.PINKY_TIP)
 
 
 @dataclass(frozen=True)
@@ -245,14 +278,17 @@ class PerceptionResult:
         perception_start:  time.monotonic() recorded before running MediaPipe.
         perception_end:    time.monotonic() recorded after MediaPipe returned.
         pose:              Body pose landmarks, or None if no person was detected.
-        hands:             List of detected hands (0, 1, or 2 entries).
+        hands:             Tuple of detected hands (0, 1, or 2 entries).
     """
     frame_id: int
     capture_timestamp: float       # from CapturedFrame — for latency chaining
     perception_start: float        # time.monotonic()
     perception_end: float          # time.monotonic()
     pose: Optional[PoseData]
-    hands: List[HandData] = field(default_factory=list)
+    hands: Tuple[HandData, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "hands", tuple(self.hands))
 
     @property
     def perception_ms(self) -> float:
@@ -266,3 +302,177 @@ class PerceptionResult:
     @property
     def num_hands(self) -> int:
         return len(self.hands)
+
+
+# ---------------------------------------------------------------------------
+# Object Detection & Environment State Models
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class BoundingBox:
+    """Normalized bounding box for detected objects.
+    
+    Coordinates are normalized to [0, 1] relative to the image frame.
+    x_min, y_min is top-left, x_max, y_max is bottom-right.
+    """
+    x_min: float
+    y_min: float
+    x_max: float
+    y_max: float
+
+    @property
+    def center_x(self) -> float:
+        return (self.x_min + self.x_max) / 2.0
+
+    @property
+    def center_y(self) -> float:
+        return (self.y_min + self.y_max) / 2.0
+
+    @property
+    def width(self) -> float:
+        return self.x_max - self.x_min
+
+    @property
+    def height(self) -> float:
+        return self.y_max - self.y_min
+
+
+@dataclass(frozen=True)
+class DetectedObject:
+    """A single detected object from YOLO or similar."""
+    class_id: int
+    class_name: str
+    confidence: float
+    bbox: BoundingBox
+
+
+@dataclass(frozen=True)
+class ObjectDetectionResult:
+    """The output of one Fast Object Detection pass on a single frame."""
+    frame_id: int
+    capture_timestamp: float
+    perception_start: float
+    perception_end: float
+    objects: Tuple[DetectedObject, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "objects", tuple(self.objects))
+
+    @property
+    def perception_ms(self) -> float:
+        return (self.perception_end - self.perception_start) * 1_000.0
+
+
+@dataclass(frozen=True)
+class TrackedObject:
+    """An object tracked across multiple frames."""
+    track_id: int
+    class_name: str
+    bbox: BoundingBox
+    center: Tuple[float, float]
+    velocity: Tuple[float, float]
+    last_seen: float  # capture_timestamp of the last frame this was detected in
+    confidence: float
+
+
+@dataclass(frozen=True)
+class Relationship:
+    """Base class for inferred relationships."""
+    pass
+
+
+@dataclass(frozen=True)
+class HandNearObject(Relationship):
+    """Inferred when a hand is spatially near an object."""
+    hand_is_left: bool
+    object_id: int
+
+
+@dataclass(frozen=True)
+class HandPointingAtObject(Relationship):
+    """Inferred when a hand's index finger is directed towards an object."""
+    hand_is_left: bool
+    object_id: int
+    
+
+@dataclass(frozen=True)
+class HandOverlappingObject(Relationship):
+    """Inferred when a hand overlaps an object's bounding box."""
+    hand_is_left: bool
+    object_id: int
+
+
+@dataclass(frozen=True)
+class HandMovingTowardObject(Relationship):
+    """Inferred when a hand is moving towards an object."""
+    hand_is_left: bool
+    object_id: int
+
+
+# ---------------------------------------------------------------------------
+# Events and Activity
+# ---------------------------------------------------------------------------
+
+class Gesture(str, Enum):
+    POINTING = "pointing"
+    RAISED_HAND = "raised_hand"
+    NONE = "none"
+    UNKNOWN = "unknown"
+
+
+@dataclass(frozen=True)
+class ActivityState:
+    """Current activity state inferred from the scene."""
+    left_hand_gesture: Gesture = Gesture.UNKNOWN
+    right_hand_gesture: Gesture = Gesture.UNKNOWN
+    motion: str = "none"
+
+
+@dataclass(frozen=True)
+class SceneEvent:
+    """Base class for discrete events occurring in the scene."""
+    timestamp: float
+
+
+@dataclass(frozen=True)
+class ObjectAppeared(SceneEvent):
+    object_id: int
+    class_name: str
+
+
+@dataclass(frozen=True)
+class ObjectDisappeared(SceneEvent):
+    object_id: int
+    class_name: str
+
+
+@dataclass(frozen=True)
+class PointingStarted(SceneEvent):
+    hand_is_left: bool
+
+
+@dataclass(frozen=True)
+class PointingStopped(SceneEvent):
+    hand_is_left: bool
+
+
+@dataclass(frozen=True)
+class HandMoved(SceneEvent):
+    hand_is_left: bool
+
+
+@dataclass(frozen=True)
+class SceneState:
+    """The complete temporal state of the scene."""
+    frame_id: int
+    timestamp: float
+    human_perception: Optional[PerceptionResult]
+    tracked_objects: Tuple[TrackedObject, ...] = ()
+    relationships: Tuple[Relationship, ...] = ()
+    recent_events: Tuple[SceneEvent, ...] = ()
+    activity: Optional[ActivityState] = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "tracked_objects", tuple(self.tracked_objects))
+        object.__setattr__(self, "relationships", tuple(self.relationships))
+        object.__setattr__(self, "recent_events", tuple(self.recent_events))

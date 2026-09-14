@@ -200,7 +200,7 @@ class TestPerceptionResult:
         assert not result.has_pose
         assert result.num_hands == 0
         assert result.pose is None
-        assert result.hands == []
+        assert len(result.hands) == 0
 
     def test_with_pose(self):
         pose = _make_pose_data()
@@ -440,7 +440,7 @@ class TestHumanPerceptionPipelineErrors:
         )
         result = pipeline.process(fake_frame)
         assert result.pose is None
-        assert result.hands == []
+        assert len(result.hands) == 0
 
     def test_is_ready_false_before_open(self, tmp_path):
         from src.perception.human import HumanPerceptionPipeline

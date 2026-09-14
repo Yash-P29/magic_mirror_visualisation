@@ -149,9 +149,8 @@ class HumanPerceptionPipeline:
         self._min_face_lm = min_face_landmarks_confidence
 
         self._landmarker: Optional[_mp_vision.HolisticLandmarker] = None
-        # Frame counter used to produce monotonically increasing timestamps
-        # for VIDEO mode (required by MediaPipe).
         self._frame_count: int = 0
+        self._last_timestamp_ms: int = -1
 
     def open(self) -> None:
         """Initialise the MediaPipe HolisticLandmarker.
@@ -190,6 +189,7 @@ class HumanPerceptionPipeline:
         )
         self._landmarker = _mp_vision.HolisticLandmarker.create_from_options(options)
         self._frame_count = 0
+        self._last_timestamp_ms = -1
         logger.info("HolisticLandmarker ready.")
 
     def close(self) -> None:
@@ -246,11 +246,16 @@ class HumanPerceptionPipeline:
             )
 
             # ------------------------------------------------------------------
-            # MediaPipe VIDEO mode requires a monotonically increasing timestamp
-            # in milliseconds.  We use the frame's capture_timestamp (monotonic
-            # seconds) converted to integer milliseconds.
+            # MediaPipe VIDEO mode requires a strictly monotonically increasing timestamp
+            # in milliseconds. We use the frame's capture_timestamp (monotonic
+            # seconds) converted to integer milliseconds, ensuring each timestamp > last.
             # ------------------------------------------------------------------
-            timestamp_ms = int(frame.capture_timestamp * 1_000)
+            raw_ts_ms = int(frame.capture_timestamp * 1_000)
+            if raw_ts_ms <= self._last_timestamp_ms:
+                timestamp_ms = self._last_timestamp_ms + 1
+            else:
+                timestamp_ms = raw_ts_ms
+            self._last_timestamp_ms = timestamp_ms
 
             # ------------------------------------------------------------------
             # Run the holistic landmarker (synchronous in VIDEO mode)
@@ -326,7 +331,7 @@ class HumanPerceptionPipeline:
             hands.append(HandData(
                 handedness=handedness,
                 landmarks=landmarks,
-                score=1.0,  # HolisticLandmarker doesn't expose handedness scores
+                score=None,  # HolisticLandmarker doesn't expose handedness scores
             ))
 
         return hands
