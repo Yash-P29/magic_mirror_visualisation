@@ -31,6 +31,8 @@ if str(_REPO_ROOT) not in sys.path:
 
 from src.camera.capture import AsyncCameraReader, Camera, CameraError
 from src.monitoring.metrics import FPSCounter, LatencyStats, LatencyTracker
+from src.intent.inference import SemanticEngine
+from src.intent.models import SemanticContext
 from src.perception.models import (
     HandNearObject,
     HandOverlappingObject,
@@ -123,14 +125,15 @@ def _draw_overlay(
     frame_id: int,
     stats: LatencyStats,
     state: Optional[SceneState],
+    semantic: Optional[SemanticContext],
     perception_enabled: bool,
     captured: int = 0,
     dropped: int = 0,
     drop_ratio: float = 0.0,
 ) -> None:
-    num_lines = 16 if perception_enabled else 9
+    num_lines = 22 if perception_enabled else 9
     panel_h = _LINE_HEIGHT * num_lines + 10
-    panel_w = 320
+    panel_w = 360
     frame[:panel_h, :panel_w] = (frame[:panel_h, :panel_w] * 0.40).astype(frame.dtype)
 
     y = _PANEL_Y_START
@@ -190,6 +193,33 @@ def _draw_overlay(
     _put_shadowed_text(frame, f"Pose:{pose_str:>3}  Hands:{hands_str:>4}  Objs:{objects_str:>3}", _PANEL_X, y, _COLOR_TEXT)
     y += _LINE_HEIGHT
     _put_shadowed_text(frame, f"Gesture: {activity_str}", _PANEL_X, y, _COLOR_TEXT)
+
+    # Semantic HUD
+    sem_color = (180, 255, 200)  # mint-green for semantic rows
+    if semantic:
+        sc = semantic.current_scene
+        opp = semantic.opportunity
+
+        _put_shadowed_text(frame, f"Activity: {sc.activity.value}", _PANEL_X, y + _LINE_HEIGHT, sem_color)
+        y += _LINE_HEIGHT
+
+        focus_str = "none"
+        if sc.focus_target:
+            ft = sc.focus_target
+            focus_str = f"{ft.label} #{ft.track_id} ({ft.confidence:.2f})"
+        _put_shadowed_text(frame, f"Focus:   {focus_str}", _PANEL_X, y + _LINE_HEIGHT, sem_color)
+        y += _LINE_HEIGHT
+
+        _put_shadowed_text(frame, f"Intent:  {opp.intent.value}", _PANEL_X, y + _LINE_HEIGHT, sem_color)
+        y += _LINE_HEIGHT
+
+        viz_str = "YES" if opp.should_visualize else "NO"
+        viz_color = (100, 255, 100) if opp.should_visualize else sem_color
+        _put_shadowed_text(frame, f"Visualize: {viz_str}  ({opp.confidence:.2f})", _PANEL_X, y + _LINE_HEIGHT, viz_color)
+    else:
+        for label in ("Activity: --", "Focus:   --", "Intent:  --", "Visualize: --"):
+            _put_shadowed_text(frame, label, _PANEL_X, y + _LINE_HEIGHT, sem_color)
+            y += _LINE_HEIGHT
 
 
 def _draw_perception(frame, state: SceneState) -> None:
@@ -357,12 +387,15 @@ def run(
             pipeline = None
             perception_enabled = False
 
+    semantic_engine = SemanticEngine(update_interval_s=0.20)  # ~5 Hz
+    last_semantic: Optional[SemanticContext] = None
+
     _print_startup_info(cam, backend_str.upper(), perception_enabled, async_mode)
 
     fps_counter = FPSCounter(window_seconds=2.0)
     lat_tracker = LatencyTracker(rolling_window=60)
     last_stats = LatencyStats()
-    last_result: Optional[PerceptionResult] = None
+    last_result: Optional[SceneState] = None
 
     cv2.namedWindow(_WINDOW_NAME, cv2.WINDOW_NORMAL)
     start_time = time.monotonic()
@@ -395,13 +428,20 @@ def run(
                 try:
                     last_result, h_ms, y_ms, t_ms = pipeline.process(frame_data)
                     lat_tracker.record_perception(
-                        perception_ms=h_ms, 
-                        yolo_ms=y_ms, 
+                        perception_ms=h_ms,
+                        yolo_ms=y_ms,
                         tracking_ms=t_ms
                     )
                 except Exception as exc:
                     logger.warning("Perception error on frame %d: %s", frame_data.frame_id, exc)
                     last_result = None
+
+            # Semantic update — rate-limited to ~5 Hz
+            if last_result is not None and semantic_engine.should_update(last_result):
+                try:
+                    last_semantic = semantic_engine.update(last_result, pipeline._history)
+                except Exception as exc:
+                    logger.warning("Semantic error on frame %d: %s", frame_data.frame_id, exc)
 
             if last_result is not None:
                 _draw_perception(frame_data.image, last_result)
@@ -432,6 +472,7 @@ def run(
                 frame_id=frame_data.frame_id,
                 stats=last_stats,
                 state=last_result,
+                semantic=last_semantic,
                 perception_enabled=perception_enabled,
                 captured=cap_cnt,
                 dropped=drop_cnt,

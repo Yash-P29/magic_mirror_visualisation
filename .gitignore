@@ -39,3 +39,4 @@ htmlcov/
 
 # Type checking
 .mypy_cache/
+yolov8n.pt
